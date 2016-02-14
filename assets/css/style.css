@@ -47,6 +47,7 @@ body {
 
 header {
 	background: #4aaaa5;
+	position: static;
 }
 
 div {
@@ -83,7 +84,7 @@ hr{
 
 
 .container {
-	width: 100%;
+	min-width: 980px 768px 640px;
 }
 
 #main-bio,
@@ -200,22 +201,12 @@ fieldset {
 	font-size:15px;
 }
 
-@media screen and (max-width: 768px) {
-
-    body {
-        background-color: #333;
+@media screen and (min-width: 640px) {
+    #contact-info {
+    	width: 980px 768px 640px;
     }
-
-    .wrapper {
-        width: 100%;
-        padding: 20px 20px 20px 20px;
-    }
-
-    section{
-        width: 100%;
-    }
-
-    #sidebar{
-        margin-top: 40px;
+    
+    #main-bio {
+    	width: 980px 768px 640px; 
     }
 }
