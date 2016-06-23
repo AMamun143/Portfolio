@@ -28,11 +28,10 @@ body:hover .main, body:hover .side {
 	height: auto !important;
 	height: 100%;
 	margin: 0 auto -91px;
-	background-image: url('../images/symphony.png');
-	background-repeat: repeat;
+	background-image: url('../images/m.png');
+	background-repeat: no-repeat;
 }
 /*Header*/
-
 .content {
 	border-top:2px solid #cccccc;
 	overflow: auto;
