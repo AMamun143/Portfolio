@@ -1,55 +1,54 @@
-$("#contactForm").validator().on("submit", function (event) {
-    if (event.isDefaultPrevented()) {
-        // handle the invalid form...
-        formError();
-        submitMSG(false, "Did you fill in the form properly?");
-    } else {
-        // everything looks good!
-        event.preventDefault();
-        submitForm();
-    }
-});
+console.log("contact form js loaded")
+$(function() {
 
+    // Get the form.
+    var form = $('#ajax-contact');
 
-function submitForm(){
-    // Initiate Variables With Form Content
-    var name = $("#name").val();
-    var email = $("#email").val();
-    var msg_subject = $("#msg_subject").val();
-    var message = $("#message").val();
+    // Get the messages div.
+    var formMessages = $('#form-messages');
 
+    // Set up an event listener for the contact form.
+    $(form).submit(function(e) {
+        // Stop the browser from submitting the form.
+        e.preventDefault();
 
-    $.ajax({
-        type: "POST",
-        url: "././assets/php/form-process.php",
-        data: "name=" + name + "&email=" + email + "&msg_subject=" + msg_subject + "&message=" + message,
-        success : function(text){
-            if (text == "success"){
-                formSuccess();
+        // Serialize the form data.
+        var formData = $(form).serialize();
+
+        // Submit the form using AJAX.
+        $.ajax({
+            type: 'POST',
+            url: $(form).attr('action'),
+            data: formData
+        })
+        .done(function(response) {
+            // Make sure that the formMessages div has the 'success' class.
+            $(formMessages).removeClass('error');
+            $(formMessages).addClass('success');
+
+            // Set the message text.
+            $(formMessages).text(response);
+
+            // Clear the form.
+            $('#name').val('');
+            $('#email').val('');
+            $('#msg_subject'.val('');
+            $('#message').val('');
+        })
+        .fail(function(data) {
+            // Make sure that the formMessages div has the 'error' class.
+            $(formMessages).removeClass('success');
+            $(formMessages).addClass('error');
+
+            // Set the message text.
+            if (data.responseText !== '') {
+                $(formMessages).text(data.responseText);
             } else {
-                formError();
-                submitMSG(false,text);
+                console.log(data);
+                $(formMessages).text('Oops! An error occured and your message could not be sent.');
             }
-        }
+        });
+
     });
-}
 
-function formSuccess(){
-    $("#contactForm")[0].reset();
-    submitMSG(true, "Message Submitted!")
-}
-
-function formError(){
-    $("#contactForm").removeClass().addClass('shake animated').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
-        $(this).removeClass();
-    });
-}
-
-function submitMSG(valid, msg){
-    if(valid){
-        var msgClasses = "h3 text-center tada animated text-success";
-    } else {
-        var msgClasses = "h3 text-center text-danger";
-    }
-    $("#msgSubmit").removeClass().addClass(msgClasses).text(msg);
-}
+});

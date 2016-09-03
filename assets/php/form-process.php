@@ -1,67 +1,55 @@
 <?php
+    // My modifications to mailer script from:
+    // http://blog.teamtreehouse.com/create-ajax-contact-form
+    // Added input sanitizing to prevent injection
 
-$errorMSG = "";
+    // Only process POST reqeusts.
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        // Get the form fields and remove whitespace.
+        $name = strip_tags(trim($_POST["name"]));
+                $name = str_replace(array("\r","\n"),array(" "," "),$name);
+        $email = filter_var(trim($_POST["email"]), FILTER_SANITIZE_EMAIL);
+        $message = trim($_POST["message"]);
 
-// NAME
-if (empty($_POST["name"])) {
-    $errorMSG = "Name is required ";
-} else {
-    $name = $_POST["name"];
-}
+        // Check that data was sent to the mailer.
+        if ( empty($name) OR empty($message) OR !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            // Set a 400 (bad request) response code and exit.
+            http_response_code(400);
+            echo "Oops! There was a problem with your submission. Please complete the form and try again.";
+            exit;
+        }
 
-// EMAIL
-if (empty($_POST["email"])) {
-    $errorMSG .= "Email is required ";
-} else {
-    $email = $_POST["email"];
-}
+        // Set the recipient email address.
+        // FIXME: Update this to your desired email address.
+        $recipient = "amamun4221@gmail.com";
 
-// MSG SUBJECT
-if (empty($_POST["msg_subject"])) {
-    $errorMSG .= "Subject is required ";
-} else {
-    $msg_subject = $_POST["msg_subject"];
-}
+        // Set the email subject.
+        $subject = "An email from your website from $name";
 
+        // Build the email content.
+        $email_content = "Name: $name\n";
+        $email_content .= "Email: $email\n\n";
+        $email_content .= "Message:\n$message\n";
 
-// MESSAGE
-if (empty($_POST["message"])) {
-    $errorMSG .= "Message is required ";
-} else {
-    $message = $_POST["message"];
-}
+        // Build the email headers.
+        $email_headers = "From: contactform@mamun.com";
+        $email_headers = "Reply-To: $name <$email>";
 
+        // Send the email.
+        if (mail($recipient, $subject, $email_content, $email_headers)) {
+            // Set a 200 (okay) response code.
+            http_response_code(200);
+            echo "Thanks! I'll get back to you as soon as I can!.";
+        } else {
+            // Set a 500 (internal server error) response code.
+            http_response_code(500);
+            echo "This is embarassing, something went wrong. Please contact me via my email above.";
+        }
 
-$EmailTo = "amamun4221@gmail.com";
-$Subject = "New Message Received";
-
-// prepare email body text
-$Body = "";
-$Body .= "Name: ";
-$Body .= $name;
-$Body .= "\n";
-$Body .= "Email: ";
-$Body .= $email;
-$Body .= "\n";
-$Body .= "Subject: ";
-$Body .= $msg_subject;
-$Body .= "\n";
-$Body .= "Message: ";
-$Body .= $message;
-$Body .= "\n";
-
-// send email
-$success = mail($EmailTo, $Subject, $Body, "From:".$email);
-
-// redirect to success page
-if ($success && $errorMSG == ""){
-   echo "success";
-}else{
-    if($errorMSG == ""){
-        echo "Something went wrong :(";
     } else {
-        echo $errorMSG;
+        // Not a POST request, set a 403 (forbidden) response code.
+        http_response_code(403);
+        echo "There was a problem with your submission, please try again.";
     }
-}
 
 ?>
